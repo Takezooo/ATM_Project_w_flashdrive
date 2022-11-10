@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "RegisterFunction.c"
 
-char PIN[7];
+//char PIN[7];
 void pin();
 void insertcard();
 void removecard();
@@ -14,16 +14,6 @@ int main(void)
 {
     insertcard();
     return 0;
-}
-void pin()
-{
-    int i;
-    for (i = 0; i<6; i++)
-    {
-        PIN[i]=getch();
-        putchar('*');
-    }
-    PIN[i]='\0';
 }
 void insertcard()
 {

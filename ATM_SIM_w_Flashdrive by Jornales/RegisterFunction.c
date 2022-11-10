@@ -11,9 +11,9 @@ typedef struct record
     char accNum[6];
     char fname[31];
     char lname[31];
-    char birthday[10];
+    char birthday[12];
     char contactNum[13];
-    char encryptedPin[7];
+    char encryptedPin[8];
     float initDep;
 
 } REC;
@@ -28,6 +28,7 @@ void makenull();
 void add(REC x);
 // void update(REC x, char n[31]);
 int locate(char accN[6]);
+int pinLocate(char Pin[8]);
 int locPosition(char accN[6]);
 int isempty();
 int isfull();
@@ -39,11 +40,12 @@ int day_validator();
 int month_validator();
 int year_validator();
 void contactChecker(char contact[13]);
+void pin();
 void insertcard();
 void registerAcc()
 {
     makenull(); // initialize the list
-    retrieve(); // populate the list with saved records
+    //retrieve(); // populate the list with saved records
     REC rec;
     int choice; //for switch
     int a, accnum, day, month, year; // accountnumber, accnum variable for int random number
@@ -62,12 +64,12 @@ void registerAcc()
         scanf(" %[^\n]s", rec.lname);
         printf("Birthday\n");
         printf("Day[dd]: ");
-        day = month_validator();
+        day = day_validator();
         printf("Month[mm]: ");
         month = month_validator();
         printf("Year[yyyy]: ");
         year = year_validator();
-        sprintf(rec.birthday, "%d\\%d\\%d", day, month, year);
+        sprintf(rec.birthday, "%d/%d/%d", day, month, year);
         printf("Contact Number: ");
         contactChecker(rec.contactNum);
         printf("\n\t===Initial Deposit===\n");
@@ -76,13 +78,14 @@ void registerAcc()
         pincode(rec.encryptedPin);
         encrypt(rec.encryptedPin);
         add(rec);
-        save(rec);
+        //save(rec);
     }
     else
     {
         printf("\nAccount already exists!\n");
         system("pause");
     }
+    //retrieve();
     display();
     return insertcard();
 }
@@ -128,7 +131,7 @@ void display()
     system("cls");
     for (i = 0; i <= L.last; i++)
     {
-        printf("%d.) %s    %s     %s    %s    %s   %.2f  %s\n", i + 1,
+        printf("%d.) %s  ,  %s   ,  %s  ,  %s  ,  %s  , %.2f  ,  %s\n", i + 1,
                L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday, L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
     }
     system("pause");
@@ -141,6 +144,16 @@ int locate(char accN[6])
             return (i);
     return (-1);
 }
+
+int pinLocate(char Pin[8])
+{
+    int i;
+    for (i = 0; i <= L.last; i++)
+        if (strcmp(L.bar[i].encryptedPin, Pin) == 0)
+            return (i);
+    return (-1);
+}
+
 int isempty()
 {
     return (L.last == -1);
@@ -296,15 +309,34 @@ void contactChecker(char contact[13])
     contact[index]='\0';
 }
 
+void pin()
+{
+    char PIN[8];
+    int i, p;
+    for (i = 0; i<6; i++)
+    {
+        PIN[i]=getch();
+        putchar('*');
+    }
+    PIN[i]='\0';
+    p=pinLocate(PIN);
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+        registerAcc();
+    }
+}
+/*
 void save(REC x)
 {
     FILE *fp;
     FILE *ft;
     int i;
     char filename[100];
-    sprintf(filename, "D:\\DaveJornales\\Algo 2223\\Project\\%s.csv", x.accNum);
+    sprintf(filename, "D:\\DaveJornales\\Algo 2223\\Project\\%s.txt", x.accNum);
     ft = fopen(filename, "w+");
-    fp = fopen("accounts.csv", "w+");
+    fp = fopen("accounts.txt", "w+");
     if (fp == NULL)
     {
         printf("File error.\n");
@@ -314,8 +346,8 @@ void save(REC x)
     {
         for (i = 0; i <= L.last; i++)
         {
-            fprintf(fp, "%s,%s,%s,%.2f", L.bar[i].accNum, L.bar[i].lname, L.bar[i].initDep, L.bar[i].encryptedPin);
-            fprintf(ft, "%s,%s,%s,%s,%s,%.2f,%s", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
+            fprintf(fp, "%s %s %s %.2f\n", L.bar[i].accNum, L.bar[i].lname, L.bar[i].initDep, L.bar[i].encryptedPin);
+            fprintf(ft, "%s %s %s %s %s %.2f %s\n", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
                     L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
         }
     }
@@ -325,7 +357,7 @@ void save(REC x)
 void retrieve() {
    FILE *fp;
    REC r;
-   fp = fopen("accounts.csv", "r+");
+   fp = fopen("accounts.txt", "r+");
    if (fp == NULL) {
      printf("File error.\n");
      system("pause");
@@ -337,3 +369,4 @@ void retrieve() {
      fclose(fp);
    }
  }
+ */

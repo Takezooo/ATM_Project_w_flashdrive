@@ -6,10 +6,10 @@
 
 int code = 33;
 
-void pincode(char pin[7]){
+void pincode(char pin[8]){
 int index =0;
 char ch;
-while(index<5){
+while(index<6){
     ch=getch();
     if (index<0)
         index=0;
@@ -28,13 +28,13 @@ while(index<5){
      putch('*');
     }
 }
-if (index==5)
+if (index==6)
     pin[index++]=ch;
 pin[index]='\0';
 
 }
 
-void encrypt(char pin[7]){
+void encrypt(char pin[]){
 int i=0;
     while(pin[i]!='\0'){
         pin[i]=pin[i] + code;
