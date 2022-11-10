@@ -33,7 +33,7 @@ int locPosition(char accN[6]);
 int isempty();
 int isfull();
 void display();
-void save(REC x);
+void save(accN[6]);
 void retrieve();
 int money_validator();
 int day_validator();
@@ -45,7 +45,7 @@ void insertcard();
 void registerAcc()
 {
     makenull(); // initialize the list
-    //retrieve(); // populate the list with saved records
+    retrieve(); // populate the list with saved records
     REC rec;
     int choice; //for switch
     int a, accnum, day, month, year; // accountnumber, accnum variable for int random number
@@ -78,7 +78,7 @@ void registerAcc()
         pincode(rec.encryptedPin);
         encrypt(rec.encryptedPin);
         add(rec);
-        //save(rec);
+        save(rec.accNum);
     }
     else
     {
@@ -327,14 +327,14 @@ void pin()
         registerAcc();
     }
 }
-/*
-void save(REC x)
+
+void save(char accN[6])
 {
     FILE *fp;
     FILE *ft;
     int i;
     char filename[100];
-    sprintf(filename, "D:\\DaveJornales\\Algo 2223\\Project\\%s.txt", x.accNum);
+    sprintf(filename, "D:\\DaveJornales\\Algo 2223\\Project\\%s.txt", accN);
     ft = fopen(filename, "w+");
     fp = fopen("accounts.txt", "w+");
     if (fp == NULL)
@@ -346,7 +346,7 @@ void save(REC x)
     {
         for (i = 0; i <= L.last; i++)
         {
-            fprintf(fp, "%s %s %s %.2f\n", L.bar[i].accNum, L.bar[i].lname, L.bar[i].initDep, L.bar[i].encryptedPin);
+            fprintf(fp, "%s %s %.2f %s\n", L.bar[i].accNum, L.bar[i].lname, L.bar[i].initDep, L.bar[i].encryptedPin);
             fprintf(ft, "%s %s %s %s %s %.2f %s\n", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
                     L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
         }
@@ -363,10 +363,10 @@ void retrieve() {
      system("pause");
    } else {
      while (!feof(fp)) {
-       fscanf(fp, "%s,%s,%s,%s,%s,%.2f,%s", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+       fscanf(fp, "%s %s %s %s %s %.2f %s", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
        add(r);
      }
      fclose(fp);
    }
  }
- */
+
