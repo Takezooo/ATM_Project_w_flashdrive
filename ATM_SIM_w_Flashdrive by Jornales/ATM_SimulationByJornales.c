@@ -13,8 +13,6 @@ void removecard();
 int main(void)
 {
     insertcard();
-    printf("\nYour PIN is %s ",PIN);
-    getch();
     return 0;
 }
 void pin()
@@ -67,29 +65,3 @@ void removecard()
     printf("Thank you for banking with TAKEZO's BANK ");
 
 }
-/*
-code = rand() % 99;
-printf("Enter PIN: ");
-pincode();
-encrypt();
-printf("\nEncrypted Pin Code = %s\n",pin);
-system("pause");
-decrypt();
-printf("decrypted Pin Code = %s\n",pin);
-return 0;
-}
-void encrypt(){
-int i=0;
-while(pin[i]!='\0'){
-    pin[i]=pin[i] + code;
-    i++;
-}
-
-}
-void decrypt(){
-int i=0;
-while(pin[i]!='\0'){
-    pin[i]=pin[i] - code;
-    i++;
-}
-*/

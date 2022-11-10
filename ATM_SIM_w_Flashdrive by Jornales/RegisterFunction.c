@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
-#include "ATMpancode.c"
+#include "PincodeEncryption.c"
 
 #define MAX 5
 typedef struct record
@@ -32,8 +32,8 @@ int locPosition(char accN[6]);
 int isempty();
 int isfull();
 void display();
-//void save(REC x);
-//void retrieve();
+void save(REC x);
+void retrieve();
 int money_validator();
 int day_validator();
 int month_validator();
@@ -43,7 +43,7 @@ void insertcard();
 void registerAcc()
 {
     makenull(); // initialize the list
-    // retrieve(); // populate the list with saved records
+    retrieve(); // populate the list with saved records
     REC rec;
     int choice; //for switch
     int a, accnum, day, month, year; // accountnumber, accnum variable for int random number
@@ -76,14 +76,13 @@ void registerAcc()
         pincode(rec.encryptedPin);
         encrypt(rec.encryptedPin);
         add(rec);
-        //save(rec);
+        save(rec);
     }
     else
     {
         printf("\nAccount already exists!\n");
         system("pause");
     }
-    //retrieve();
     display();
     return insertcard();
 }
@@ -315,12 +314,9 @@ void save(REC x)
     {
         for (i = 0; i <= L.last; i++)
         {
-            fprintf(fp, "%s\n%s\n%s\n%.2f", L.bar[i].accNum,
-                    L.bar[i].fname, L.bar[i].lname, L.bar[i].initDep);
-            fprintf(ft, "Account Number: %s\nFirstname: %s\nLastname: %s\nMiddlename: %s\nGender: %s\nAge: %d\nAddress: %s\nEmail address: %s\nMobile No.: %s\nTel. No.: %s\nAccount Type: %s\nBalance: %.2f",
-                    L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].mname,
-                    L.bar[i].gender, L.bar[i].age, L.bar[i].address, L.bar[i].eAddress,
-                    L.bar[i].mobileNum, L.bar[i].telNum, L.bar[i].accType, L.bar[i].initDep);
+            fprintf(fp, "%s,%s,%s,%.2f", L.bar[i].accNum, L.bar[i].lname, L.bar[i].initDep, L.bar[i].encryptedPin);
+            fprintf(ft, "%s,%s,%s,%s,%s,%.2f,%s", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
+                    L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
         }
     }
     fclose(fp);
@@ -329,16 +325,15 @@ void save(REC x)
 void retrieve() {
    FILE *fp;
    REC r;
-   fp = fopen("accounts.txt", "r+");
+   fp = fopen("accounts.csv", "r+");
    if (fp == NULL) {
      printf("File error.\n");
      system("pause");
    } else {
      while (!feof(fp)) {
-       fscanf(fp, "%s\n%s\n%s\n%.2f", r.accNum, r.fname, r.lname, &r.initDep);
+       fscanf(fp, "%s,%s,%s,%s,%s,%.2f,%s", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
        add(r);
      }
      fclose(fp);
    }
  }
- */
