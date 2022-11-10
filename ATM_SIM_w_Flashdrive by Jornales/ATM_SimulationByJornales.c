@@ -21,7 +21,7 @@ void insertcard()
     do
     {
         printf("Please insert card...");
-        fp=fopen("E:\\test\\account.txt","r");
+        fp=fopen("E:\\test\\account.csv","r");
         system("cls");
         if (NULL != fp)
         {
@@ -48,7 +48,7 @@ void removecard()
     {
         system("cls");
         printf("Please remove card...");
-        fp=fopen("E:\\test\\account.txt","r");
+        fp=fopen("E:\\test\\account.csv","r");
     }
     while(fp!=NULL);
     fclose(fp);

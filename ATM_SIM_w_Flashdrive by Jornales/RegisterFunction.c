@@ -33,7 +33,7 @@ int locPosition(char accN[6]);
 int isempty();
 int isfull();
 void display();
-void save(accN[6]);
+void save(char accN[6]);
 void retrieve();
 int money_validator();
 int day_validator();
@@ -296,7 +296,10 @@ void contactChecker(char contact[13])
             continue;
         }
 
-        if(ch == 13 && index == 8){break;}
+        if(ch == 13 && index == 8)
+        {
+            break;
+        }
 
         if(isdigit(ch))
         {
@@ -304,7 +307,7 @@ void contactChecker(char contact[13])
             putch(ch);
         }
     }
-    if (index==10)
+    if (index==11)
         contact[index++]=ch;
     contact[index]='\0';
 }
@@ -317,26 +320,31 @@ void pin()
     {
         PIN[i]=getch();
         putchar('*');
+        if(PIN[i] == 13){
+            encrypt(PIN);
+            p=pinLocate(PIN);
+            if (p==-1)
+            {
+                printf("Not found.\n");
+                system("pause");
+                registerAcc();
+            }
+        }
     }
     PIN[i]='\0';
-    p=pinLocate(PIN);
-    if (p==-1)
-    {
-        printf("Not found.\n");
-        system("pause");
-        registerAcc();
-    }
 }
 
 void save(char accN[6])
 {
     FILE *fp;
     FILE *ft;
+    FILE *fep;
     int i;
     char filename[100];
-    sprintf(filename, "D:\\DaveJornales\\Algo 2223\\Project\\%s.txt", accN);
+    sprintf(filename, "D:\\DaveJornales\\Algo 2223\\Project\\%s.csv", accN);
     ft = fopen(filename, "w+");
-    fp = fopen("accounts.txt", "w+");
+    fp = fopen("accounts.csv", "w+");
+    fep=fopen("E:\\test\\account.csv","w+");
     if (fp == NULL)
     {
         printf("File error.\n");
@@ -346,24 +354,26 @@ void save(char accN[6])
     {
         for (i = 0; i <= L.last; i++)
         {
-            fprintf(fp, "%s %s %.2f %s\n", L.bar[i].accNum, L.bar[i].lname, L.bar[i].initDep, L.bar[i].encryptedPin);
-            fprintf(ft, "%s %s %s %s %s %.2f %s\n", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
+            fprintf(fp, "%s, %s, %.2f, %s\n", L.bar[i].accNum, L.bar[i].lname, L.bar[i].initDep, L.bar[i].encryptedPin);
+            fprintf(ft, "%s, %s, %s, %s, %s, %.2f, %s\n", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
                     L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
+            fprintf(fep, "%s, %.2f\n", L.bar[i].encryptedPin, L.bar[i].initDep);
         }
     }
     fclose(fp);
     fclose(ft);
+    fclose(fep);
 }
 void retrieve() {
    FILE *fp;
    REC r;
-   fp = fopen("accounts.txt", "r+");
+   fp = fopen("accounts.csv", "r+");
    if (fp == NULL) {
      printf("File error.\n");
      system("pause");
    } else {
      while (!feof(fp)) {
-       fscanf(fp, "%s %s %s %s %s %.2f %s", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+       fscanf(fp, "%s, %s, %s, %s, %s, %.2f, %s", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
        add(r);
      }
      fclose(fp);
