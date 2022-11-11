@@ -36,9 +36,9 @@ void insertcard()
         }
     }
     while(fp==NULL);
-    fclose(fp);
     printf("Thank you. Please enter PIN : ");
     pin();
+    fclose(fp);
 }
 
 void removecard()

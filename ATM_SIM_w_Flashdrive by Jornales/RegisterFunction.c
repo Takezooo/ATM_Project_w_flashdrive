@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include "PincodeEncryption.c"
 
-#define MAX 5
+#define MAX 100
 typedef struct record
 {
     char accNum[6];
@@ -33,7 +33,7 @@ int locPosition(char accN[6]);
 int isempty();
 int isfull();
 void display();
-void save(char accN[6]);
+void save();
 void retrieve();
 int money_validator();
 int day_validator();
@@ -42,6 +42,7 @@ int year_validator();
 void contactChecker(char contact[13]);
 void pin();
 void insertcard();
+void removecard();
 void registerAcc()
 {
     makenull(); // initialize the list
@@ -78,7 +79,7 @@ void registerAcc()
         pincode(rec.encryptedPin);
         encrypt(rec.encryptedPin);
         add(rec);
-        save(rec.accNum);
+        save();
     }
     else
     {
@@ -149,9 +150,11 @@ int pinLocate(char Pin[8])
 {
     int i;
     for (i = 0; i <= L.last; i++)
-        if (strcmp(L.bar[i].encryptedPin, Pin) == 0)
+    {
+        if (strcmp(L.bar[i].encryptedPin, Pin) > 0)
             return (i);
-    return (-1);
+    }
+    return (i); // L.last+1
 }
 
 int isempty()
@@ -314,13 +317,26 @@ void contactChecker(char contact[13])
 
 void pin()
 {
+    retrieve();
     char PIN[8];
-    int i, p;
-    for (i = 0; i<6; i++)
+    int p, index =0;
+    char ch;
+    while(index<6)
     {
-        PIN[i]=getch();
-        putchar('*');
-        if(PIN[i] == 13){
+        ch=getch();
+        if (index<0)
+            index=0;
+        if(ch==8 && index != 0) //backspace ascii is 8
+        {
+            putch('\b');
+            putch(' ');
+            putch('\b');
+            index--;
+            continue;
+        }
+
+        if(ch == 13 && index == 4)
+        {
             encrypt(PIN);
             p=pinLocate(PIN);
             if (p==-1)
@@ -329,20 +345,39 @@ void pin()
                 system("pause");
                 registerAcc();
             }
+            break;
+        }
+
+        if(isdigit(ch))
+        {
+            PIN[index++]=ch;
+            putch('*');
         }
     }
-    PIN[i]='\0';
+    if (index==6){
+        PIN[index++]=ch;
+    }
+    PIN[index]='\0';
+    encrypt(PIN);
+    p=pinLocate(PIN);
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+        registerAcc();
+    }
+    else
+    {
+        return removecard();
+    }
 }
 
-void save(char accN[6])
+void save()
 {
     FILE *fp;
     FILE *ft;
     FILE *fep;
     int i;
-    char filename[100];
-    sprintf(filename, "D:\\DaveJornales\\Algo 2223\\Project\\%s.csv", accN);
-    ft = fopen(filename, "w+");
     fp = fopen("accounts.csv", "w+");
     fep=fopen("E:\\test\\account.csv","w+");
     if (fp == NULL)
@@ -354,29 +389,36 @@ void save(char accN[6])
     {
         for (i = 0; i <= L.last; i++)
         {
-            fprintf(fp, "%s, %s, %.2f, %s\n", L.bar[i].accNum, L.bar[i].lname, L.bar[i].initDep, L.bar[i].encryptedPin);
-            fprintf(ft, "%s, %s, %s, %s, %s, %.2f, %s\n", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
+            fprintf(fp, "%s, %s, %s, %s, %s, %.2f, %s\n", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
                     L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
             fprintf(fep, "%s, %.2f\n", L.bar[i].encryptedPin, L.bar[i].initDep);
         }
     }
     fclose(fp);
-    fclose(ft);
     fclose(fep);
 }
-void retrieve() {
-   FILE *fp;
-   REC r;
-   fp = fopen("accounts.csv", "r+");
-   if (fp == NULL) {
-     printf("File error.\n");
-     system("pause");
-   } else {
-     while (!feof(fp)) {
-       fscanf(fp, "%s, %s, %s, %s, %s, %.2f, %s", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
-       add(r);
-     }
-     fclose(fp);
-   }
- }
+void retrieve()
+{
+    FILE *fp;
+    FILE *fep;
+    REC r;
+    fp = fopen("accounts.csv", "r+");
+    fep=fopen("E:\\test\\account.csv","r+");
+    if (fp == NULL)
+    {
+        printf("File error.\n");
+        system("pause");
+    }
+    else
+    {
+        while (!feof(fp) && !feof(fep))
+        {
+            fscanf(fp, "%s, %s, %s, %s, %s, %.2f, %s\n", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+            fscanf(fep, "%s, %.2f\n", r.encryptedPin, r.initDep);
+            add(r);
+        }
+        fclose(fp);
+        fclose(fep);
+    }
+}
 
