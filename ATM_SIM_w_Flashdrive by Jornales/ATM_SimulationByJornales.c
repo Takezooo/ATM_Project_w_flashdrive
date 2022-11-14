@@ -5,26 +5,54 @@
 #include <stdlib.h>
 #include "RegisterFunction.c"
 
-char PIN[7];
-void pin();
+void welcome_menu();
+void transaction_menu();
 void insertcard();
 void removecard();
+int switch_validator();
 
 int main(void)
 {
-    insertcard();
+    welcome_menu();
     return 0;
 }
-void pin()
+
+void welcome_menu()
 {
-    int i;
-    for (i = 0; i<6; i++)
-    {
-        PIN[i]=getch();
-        putchar('*');
-    }
-    PIN[i]='\0';
+    int choice;
+
+    do{
+        system("cls");
+        printf("1. REGISTER NEW ACC\n");
+        printf("2. INSERT ATM CARD\n");
+        printf("3. EXIT\n");
+
+        choice = switch_validator();
+        switch(choice)
+        {
+            case 1:
+                printf("REGISTER ACCOUNT\n");
+                registerAcc();
+                break;
+
+            case 2:
+                printf("INSERT CARD\n");
+                insertcard();
+                break;
+            case 3:
+                printf("EXIT\n");
+                system("pause");
+                exit(0);
+
+        }
+    }while(choice == 0);
 }
+
+void transaction_menu()
+{
+
+}
+
 void insertcard()
 {
     FILE *fp;
@@ -41,14 +69,15 @@ void insertcard()
             if (0 == size)
             {
                 printf("\t\t=========NOT REGISTERED!=========\n");
+                system("pause");
                 registerAcc();
             }
         }
     }
     while(fp==NULL);
-    fclose(fp);
     printf("Thank you. Please enter PIN : ");
     pin();
+    fclose(fp);
 }
 
 void removecard()
@@ -65,3 +94,35 @@ void removecard()
     printf("Thank you for banking with TAKEZO's BANK ");
 
 }
+
+int switch_validator()
+{
+    int isAllDigit = 1;
+    char inputCheck[2];
+    do
+    {
+        isAllDigit = 1;
+
+        printf("OPTION RANGES 1-4");
+        printf(">> ");
+        scanf("%s", inputCheck);
+        for (int i = 0; i < strlen(inputCheck); i++)
+        {
+            if (!isdigit(inputCheck[i]))
+            {
+                isAllDigit = 0;
+                printf("Invalid Input!\n");
+                break;
+            }
+        }
+
+        if (isAllDigit)
+        {
+            atoi(inputCheck);
+        }
+
+    }
+    while(atoi(inputCheck) < 1 || atoi(inputCheck) > 3);
+    return atoi(inputCheck);
+}
+

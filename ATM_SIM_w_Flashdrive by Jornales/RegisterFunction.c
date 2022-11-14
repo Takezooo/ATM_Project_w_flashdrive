@@ -5,18 +5,19 @@
 #include <ctype.h>
 #include "PincodeEncryption.c"
 
-#define MAX 5
+#define MAX 100
 typedef struct record
 {
     char accNum[6];
     char fname[31];
     char lname[31];
-    char birthday[10];
+    char birthday[12];
     char contactNum[13];
-    char encryptedPin[7];
+    char encryptedPin[4];
     float initDep;
 
 } REC;
+
 typedef struct list
 {
     REC bar[MAX]; // bank acc record
@@ -24,28 +25,31 @@ typedef struct list
 } LIST;
 LIST L;
 
-void makenull();
-void add(REC x);
-// void update(REC x, char n[31]);
 int locate(char accN[6]);
 int locPosition(char accN[6]);
+int pinLocate(char Pin[4]);
 int isempty();
 int isfull();
-void display();
-void save(REC x);
-void retrieve();
 int money_validator();
 int day_validator();
 int month_validator();
 int year_validator();
 void contactChecker(char contact[13]);
+char * removeSpacesFromStr(char *string);
+void welcome_menu();
 void insertcard();
+void pin();
+void removecard();
+void makenull();
+void add(REC x);
+void display();
+void save();
+void retrieve();
 void registerAcc()
 {
     makenull(); // initialize the list
     retrieve(); // populate the list with saved records
     REC rec;
-    int choice; //for switch
     int a, accnum, day, month, year; // accountnumber, accnum variable for int random number
     srand(time(0));
     //system("cls");
@@ -58,16 +62,18 @@ void registerAcc()
     {
         printf("First Name: ");
         scanf(" %[^\n]s", rec.fname);
+        removeSpacesFromStr(rec.fname);
         printf("Last Name: ");
         scanf(" %[^\n]s", rec.lname);
+        removeSpacesFromStr(rec.lname);
         printf("Birthday\n");
         printf("Day[dd]: ");
-        day = month_validator();
+        day = day_validator();
         printf("Month[mm]: ");
         month = month_validator();
         printf("Year[yyyy]: ");
         year = year_validator();
-        sprintf(rec.birthday, "%d\\%d\\%d", day, month, year);
+        sprintf(rec.birthday, "%d/%d/%d", day, month, year);
         printf("Contact Number: ");
         contactChecker(rec.contactNum);
         printf("\n\t===Initial Deposit===\n");
@@ -76,7 +82,7 @@ void registerAcc()
         pincode(rec.encryptedPin);
         encrypt(rec.encryptedPin);
         add(rec);
-        save(rec);
+        save();
     }
     else
     {
@@ -84,7 +90,16 @@ void registerAcc()
         system("pause");
     }
     display();
-    return insertcard();
+    return welcome_menu();
+}
+
+int locate(char accN[6])
+{
+    int i;
+    for (i = 0; i <= L.last; i++)
+        if (strcmp(L.bar[i].accNum, accN) == 0)
+            return (i);
+    return (-1);
 }
 
 int locPosition(char accN[6])
@@ -97,54 +112,28 @@ int locPosition(char accN[6])
     }
     return (i); // L.last+1
 }
-void makenull()
+
+int pinLocate(char Pin[4])
 {
-    L.last = -1;
-}
-void add(REC x)
-{
-    int i, p;
-    if (isfull())
+    printf("%s", Pin);
+    int i;
+    for (i = 0; i <= L.last; i++)
     {
-        printf("List is full.\n");
-        system("pause");
-    }
-    else
-    {
-        p = locPosition(x.accNum);
-        for (i = L.last; i >= p; i--)
+        printf("%s", L.bar[i].encryptedPin);
+        if (strcmp(L.bar[i].encryptedPin, Pin) == 0)
         {
-            L.bar[i + 1] = L.bar[i];
-        }
-        L.bar[p] = x;
-
-        L.last++;
-    }
-}
-
-void display()
-{
-    int i;
-    system("cls");
-    for (i = 0; i <= L.last; i++)
-    {
-        printf("%d.) %s    %s     %s    %s    %s   %.2f  %s\n", i + 1,
-               L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday, L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
-    }
-    system("pause");
-}
-int locate(char accN[6])
-{
-    int i;
-    for (i = 0; i <= L.last; i++)
-        if (strcmp(L.bar[i].accNum, accN) == 0)
             return (i);
-    return (-1);
+        }
+
+    }
+    return (-1); // L.last+1
 }
+
 int isempty()
 {
     return (L.last == -1);
 }
+
 int isfull()
 {
     return (L.last == MAX - 1);
@@ -236,7 +225,6 @@ int month_validator()
     return atoi(month);
 }
 
-
 int year_validator()
 {
     int isAllDigit = 1;
@@ -283,7 +271,10 @@ void contactChecker(char contact[13])
             continue;
         }
 
-        if(ch == 13 && index == 8){break;}
+        if(ch == 13 && index == 8)
+        {
+            break;
+        }
 
         if(isdigit(ch))
         {
@@ -291,20 +282,138 @@ void contactChecker(char contact[13])
             putch(ch);
         }
     }
-    if (index==10)
+    if (index==11)
         contact[index++]=ch;
     contact[index]='\0';
 }
 
-void save(REC x)
+char * removeSpacesFromStr(char *string)
+{
+    // non_space_count to keep the frequency of non space characters
+    int non_space_count = 0;
+
+    //Traverse a string and if it is non space character then, place it at index non_space_count
+    for (int i = 0; string[i] != '\0'; i++)
+    {
+        if (string[i] != ' ')
+        {
+            string[non_space_count] = string[i];
+            non_space_count++;//non_space_count incremented
+        }
+    }
+
+    //Finally placing final character at the string end
+    string[non_space_count] = '\0';
+    return string;
+}
+
+void pin()
 {
     FILE *fp;
-    FILE *ft;
+    REC r;
+    fp=fopen("E:\\test\\account.txt","r+");
+    if (fp == NULL)
+    {
+        printf("File error.\n");
+        system("pause");
+    }
+    else
+    {
+        while (!feof(fp))
+        {
+            fscanf(fp, "%s %s %s %s %s %f %s\n", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+            add(r);
+        }
+    }
+
+    char PIN[4];
+    int p, index =0;
+    char ch;
+    while(index<4)
+    {
+        ch=getch();
+        if (index<0)
+            index=0;
+        if(ch==8 && index != 0) //backspace ascii is 8
+        {
+            putch('\b');
+            putch(' ');
+            putch('\b');
+            index--;
+            continue;
+        }
+
+
+        if(isdigit(ch))
+        {
+            PIN[index++]=ch;
+            putch('*');
+        }
+    }
+
+    PIN[index]='\0';
+    encrypt(PIN);
+    p=pinLocate(PIN);
+    fclose(fp);
+    if (p==-1)
+    {
+        printf("Not found2.\n");
+        system("pause");
+        registerAcc();
+    }
+    else
+    {
+        return welcome_menu();
+    }
+}
+
+void makenull()
+{
+    L.last = -1;
+}
+
+void add(REC x)
+{
+    int i, p;
+    if (isfull())
+    {
+        printf("List is full.\n");
+        system("pause");
+    }
+    else
+    {
+        p = locPosition(x.accNum);
+        for (i = L.last; i >= p; i--)
+        {
+            L.bar[i + 1] = L.bar[i];
+        }
+        L.bar[p] = x;
+
+        L.last++;
+    }
+}
+
+void display()
+{
     int i;
-    char filename[100];
-    sprintf(filename, "D:\\DaveJornales\\Algo 2223\\Project\\%s.csv", x.accNum);
-    ft = fopen(filename, "w+");
-    fp = fopen("accounts.csv", "w+");
+    system("cls");
+    for (i = 0; i <= L.last; i++)
+    {
+        printf("%d.) %s  ,  %s   ,  %s  ,  %s  ,  %s  , %.2f  ,  %s\n", i + 1,
+               L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday, L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
+    }
+    system("pause");
+}
+
+void save()
+{
+    FILE *fp;
+    FILE *fep;
+    int i;
+    fp = fopen("accounts.txt", "w+");
+    fep = fopen("E:\\test\\account.txt", "r+");
+    fseek (fep, 0, SEEK_END);
+    int size = ftell(fep);
     if (fp == NULL)
     {
         printf("File error.\n");
@@ -314,26 +423,36 @@ void save(REC x)
     {
         for (i = 0; i <= L.last; i++)
         {
-            fprintf(fp, "%s,%s,%s,%.2f", L.bar[i].accNum, L.bar[i].lname, L.bar[i].initDep, L.bar[i].encryptedPin);
-            fprintf(ft, "%s,%s,%s,%s,%s,%.2f,%s", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
+            fprintf(fp, "%s %s %s %s %s %f %s\n", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
                     L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
+        }
+        if (0 == size)
+        {
+            fprintf(fep, "%s %s %s %s %s %f %s\n", L.bar[L.last].accNum, L.bar[L.last].fname, L.bar[L.last].lname, L.bar[L.last].birthday,
+                    L.bar[L.last].contactNum, L.bar[L.last].initDep, L.bar[L.last].encryptedPin);
         }
     }
     fclose(fp);
-    fclose(ft);
+    fclose(fep);
 }
-void retrieve() {
-   FILE *fp;
-   REC r;
-   fp = fopen("accounts.csv", "r+");
-   if (fp == NULL) {
-     printf("File error.\n");
-     system("pause");
-   } else {
-     while (!feof(fp)) {
-       fscanf(fp, "%s,%s,%s,%s,%s,%.2f,%s", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
-       add(r);
-     }
-     fclose(fp);
-   }
- }
+
+void retrieve()
+{
+    FILE *fp;
+    REC r;
+    fp = fopen("accounts.txt", "r+");
+    if (fp == NULL)
+    {
+        printf("File error.\n");
+        system("pause");
+    }
+    else
+    {
+        while (!feof(fp))
+        {
+            fscanf(fp, "%s %s %s %s %s %f %s\n", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+            add(r);
+        }
+        fclose(fp);
+    }
+}

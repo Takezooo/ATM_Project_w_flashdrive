@@ -6,37 +6,38 @@
 
 int code = 33;
 
-void pincode(char pin[7]){
-int index =0;
-char ch;
-while(index<5){
-    ch=getch();
-    if (index<0)
-        index=0;
-    if(ch==8 && index != 0){//backspace ascii is 8
-        putch('\b');
-        putch(' ');
-        putch('\b');
-        index--;
-     continue;
+void pincode(char pin[4])
+{
+    int index =0;
+    char ch;
+    while(index<4)
+    {
+        ch=getch();
+        if (index<0)
+            index=0;
+        if(ch==8 && index != 0) //backspace ascii is 8
+        {
+            putch('\b');
+            putch(' ');
+            putch('\b');
+            index--;
+            continue;
+        }
+
+        if(isdigit(ch))
+        {
+            pin[index++]=ch;
+            putch('*');
+        }
     }
-
-    if(ch == 13 && index == 4){break;}
-
-    if(isdigit(ch)){
-     pin[index++]=ch;
-     putch('*');
-    }
-}
-if (index==5)
-    pin[index++]=ch;
-pin[index]='\0';
-
+    pin[index]='\0';
 }
 
-void encrypt(char pin[7]){
-int i=0;
-    while(pin[i]!='\0'){
+void encrypt(char pin[4])
+{
+    int i=0;
+    while(pin[i]!='\0')
+    {
         pin[i]=pin[i] + code;
         i++;
     }
