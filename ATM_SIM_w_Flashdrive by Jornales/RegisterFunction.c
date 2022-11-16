@@ -9,7 +9,10 @@
 
 //GLOBAL VARIABLES
 char an[6];
+char anTo[6];
+char encryptedpin[4];
 float balance;
+float moneyTo;
 
 typedef struct record
 {
@@ -52,6 +55,11 @@ void withdraw();
 void withdrawmain();
 void deposit();
 void depositmain();
+void balanceinquiry();
+void fundtransfer();
+void transferFundTo();
+void changepin();
+void changepinmain();
 void display();
 void save();
 void saveATM();
@@ -509,16 +517,14 @@ void deposit()
     }
     else
     {
-        printf("Enter amount you wish to deposit: ");
-        scanf("%f", &deposit);
+        deposit = deposit_validator();
         L.bar[p].initDep += deposit;
-        printf("Withdraw: %.2f\n", deposit);
+        printf("Deposit: %.2f\n", deposit);
         printf("Current Balance: %.2f\n", L.bar[p].initDep);
         balance = L.bar[p].initDep;
         system("pause");
         saveATM();
         depositmain();
-
     }
 
 }
@@ -537,6 +543,195 @@ void depositmain()
     else
     {
         L.bar[p].initDep = balance;
+        save();
+        transaction_menu();
+    }
+}
+
+void balanceinquiry()
+{
+    makenull();
+    FILE *fp;
+    REC r;
+    fp=fopen("E:\\test\\account.txt","r+");
+    if (fp == NULL)
+    {
+        printf("File error.\n");
+        system("pause");
+    }
+    else
+    {
+        while (!feof(fp))
+        {
+            fscanf(fp, "%s %s %s %s %s %f %s\n", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+            add(r);
+        }
+    }
+    fclose(fp);
+    int i;
+    printf("\n\tAccount Number: %s\n", L.bar[i].accNum);
+    printf("\tName: %s, %s\n", L.bar[i].lname, L.bar[i].fname);
+    printf("\tBirthday: %s\n", L.bar[i].birthday);
+    printf("\tContact Number: %s\n", L.bar[i].contactNum);
+    printf("\n\t\tCURRENT BALANCE: %.2f\n", L.bar[i].initDep);
+
+    system("pause");
+    transaction_menu();
+}
+
+void fundtransfer()
+{
+    makenull();
+    FILE *fp;
+    REC r;
+    fp=fopen("E:\\test\\account.txt","r+");
+    if (fp == NULL)
+    {
+        printf("File error.\n");
+        system("pause");
+    }
+    else
+    {
+        while (!feof(fp))
+        {
+            fscanf(fp, "%s %s %s %s %s %f %s\n", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+            add(r);
+        }
+    }
+    fclose(fp);
+    strcpy(an, L.bar[L.last].accNum);
+    int p;
+    p=locate(an);
+    float transferfund, changedValue;
+    char transferTo[6];
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+    }
+    else
+    {
+        printf("CURRENT BALANCE: %.2f\n", L.bar[p].initDep);
+        transferfund = transfer_validator();
+        if(transferfund > L.bar[p].initDep)
+        {
+            printf("\nInsufficient Balance\n");
+            system("pause");
+            transaction_menu();
+        }
+        else
+        {
+            L.bar[p].initDep -= transferfund;
+            moneyTo = transferfund;
+            printf("Transfer Fund: %.2f\n", transferfund);
+            printf("Current Balance: %.2f\n", L.bar[p].initDep);
+            printf("Transfer money to: ");
+            scanf(" %[^\n]s", transferTo);
+            removeSpacesFromStr(transferTo);
+            strcpy(anTo, transferTo);
+            balance = L.bar[p].initDep;
+            system("pause");
+            saveATM();
+            transferFundTo();
+        }
+    }
+}
+
+void transferFundTo()
+{
+    makenull();
+    retrieve();
+    int p;
+    p=locate(an);
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+    }
+    else
+    {
+        L.bar[p].initDep = balance;
+        save();
+    }
+    p=locate(anTo);
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+    }
+    else
+    {
+        system("cls");
+        printf("\t\tTRANSFER SUCCESS\n");
+        L.bar[p].initDep += moneyTo;
+        save();
+        printf("\n\tAccount Number: %s\n", L.bar[p].accNum);
+        printf("\tName: %s, %s\n", L.bar[p].lname, L.bar[p].fname);
+        printf("\tBirthday: %s\n", L.bar[p].birthday);
+        printf("\tContact Number: %s\n", L.bar[p].contactNum);
+        printf("\n\t\tCURRENT BALANCE: %.2f\n", L.bar[p].initDep);
+        system("pause");
+        transaction_menu();
+    }
+}
+
+void changepin()
+{
+
+    makenull();
+    FILE *fp;
+    REC r;
+    fp=fopen("E:\\test\\account.txt","r+");
+    if (fp == NULL)
+    {
+        printf("File error.\n");
+        system("pause");
+    }
+    else
+    {
+        while (!feof(fp))
+        {
+            fscanf(fp, "%s %s %s %s %s %f %s\n", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+            add(r);
+        }
+    }
+    fclose(fp);
+    strcpy(an, L.bar[L.last].accNum);
+    int p;
+    p=locate(an);
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+    }
+    else
+    {
+        printf("\nChange PIN: ");
+        pincode(encryptedpin);
+        encrypt(encryptedpin);
+        strcpy(L.bar[p].encryptedPin, encryptedpin);
+        saveATM();
+        printf("\nCHANGE PIN SUCCESS");
+        system("pause");
+        changepinmain();
+    }
+
+}
+
+void changepinmain()
+{
+    makenull();
+    retrieve();
+    int p;
+    p=locate(an);
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+    }
+    else
+    {
+        strcpy(L.bar[p].encryptedPin, encryptedpin);
         save();
         transaction_menu();
     }

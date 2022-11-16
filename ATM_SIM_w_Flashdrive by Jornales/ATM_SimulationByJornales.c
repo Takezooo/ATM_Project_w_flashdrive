@@ -9,7 +9,8 @@ void welcome_menu();
 void transaction_menu();
 void insertcard();
 void removecard();
-int switch_validator();
+int switch_validator_welcome();
+int switch_validator_transaction();
 
 int main(void)
 {
@@ -27,7 +28,7 @@ void welcome_menu()
         printf("2. INSERT ATM CARD\n");
         printf("3. EXIT\n");
 
-        choice = switch_validator();
+        choice = switch_validator_welcome();
         switch(choice)
         {
             case 1:
@@ -54,23 +55,47 @@ void transaction_menu()
 
     do{
         system("cls");
-        printf("1. WITHDRAW\n");
-        printf("2. DEPOSIT\n");
-        printf("3. BACK TO WELCOME SCREEN\n");
-
-        choice = switch_validator();
+        printf("[1] Balance Inquiry\n");
+        printf("[2] Withdraw\n");
+        printf("[3] Deposit\n");
+        printf("[4] Fund Transfer\n");
+        printf("[5] Change PIN Code\n");
+        printf("[6] Back\n");
+        choice = switch_validator_transaction();
         switch(choice)
         {
             case 1:
-                printf("WITHDRAW\n");
-                withdraw();
+                system("cls");
+                printf("\t\t\tBALANCE INQUIRY\n");
+                balanceinquiry();
                 break;
 
             case 2:
-                printf("DEPOSIT\n");
+                system("cls");
+                printf("\t\t\tWITHDRAW\n");
+                withdraw();
+                break;
+
+            case 3:
+                system("cls");
+                printf("\t\t\tDEPOSIT\n");
                 deposit();
                 break;
-            case 3:
+
+            case 4:
+                system("cls");
+                printf("\t\t\tFUND TRANSFER\n");
+                fundtransfer();
+                break;
+
+            case 5:
+                system("cls");
+                printf("\t\t\tCHANGE PIN\n");
+                changepin();
+                break;
+
+            case 6:
+                system("cls");
                 printf("BACK\n");
                 system("pause");
                 return welcome_menu();
@@ -121,7 +146,7 @@ void removecard()
 
 }
 
-int switch_validator()
+int switch_validator_welcome()
 {
     int isAllDigit = 1;
     char inputCheck[2];
@@ -152,3 +177,33 @@ int switch_validator()
     return atoi(inputCheck);
 }
 
+int switch_validator_transaction()
+{
+    int isAllDigit = 1;
+    char inputCheck[2];
+    do
+    {
+        isAllDigit = 1;
+
+        printf("OPTION RANGES 1-6");
+        printf(">> ");
+        scanf("%s", inputCheck);
+        for (int i = 0; i < strlen(inputCheck); i++)
+        {
+            if (!isdigit(inputCheck[i]))
+            {
+                isAllDigit = 0;
+                printf("Invalid Input!\n");
+                break;
+            }
+        }
+
+        if (isAllDigit)
+        {
+            atoi(inputCheck);
+        }
+
+    }
+    while(atoi(inputCheck) < 1 || atoi(inputCheck) > 6);
+    return atoi(inputCheck);
+}

@@ -76,3 +76,66 @@ int withdraw_validator()
     return atoi(money);
 }
 
+int deposit_validator()
+{
+    int isAllDigit = 1;
+    char money[50];
+    do
+    {
+        isAllDigit = 1;
+        printf("\nEnter amount you wish to deposit");
+        printf(">> ");
+        scanf("%s", money);
+        for (int i = 0; i < strlen(money); i++)
+        {
+            if (!isdigit(money[i]))
+            {
+                isAllDigit = 0;
+                printf("Invalid Input!\n");
+                break;
+            }
+        }
+
+        if (isAllDigit)
+        {
+            atoi(money);
+            if ( atoi(money) < 0){printf("\nYou can't deposit something less than 1.\n");}
+            if ( atoi(money) > 500000){printf("\nYou can't deposit something greater than 500000.\n");}
+        }
+
+    }
+    while(atoi(money) < 0 || atoi(money) > 500000);
+    return atoi(money);
+}
+
+int transfer_validator()
+{
+    int isAllDigit = 1;
+    char money[50];
+    do
+    {
+        isAllDigit = 1;
+        printf("\nEnter amount you wish to transfer");
+        printf(">> ");
+        scanf("%s", money);
+        for (int i = 0; i < strlen(money); i++)
+        {
+            if (!isdigit(money[i]))
+            {
+                isAllDigit = 0;
+                printf("Invalid Input!\n");
+                break;
+            }
+        }
+
+        if (isAllDigit)
+        {
+            atoi(money);
+            if ( atoi(money) < 1){printf("\nYou can't transfer something less than 1.\n");}
+            if ( atoi(money) > 500000){printf("\nYou can't transfer something greater than 500000.\n");}
+        }
+
+    }
+    while(atoi(money) < 1 || atoi(money) > 500000);
+    return atoi(money);
+}
