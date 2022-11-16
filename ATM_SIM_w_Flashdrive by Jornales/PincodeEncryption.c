@@ -42,3 +42,37 @@ void encrypt(char pin[4])
         i++;
     }
 }
+
+int withdraw_validator()
+{
+    int isAllDigit = 1;
+    char money[50];
+    do
+    {
+        isAllDigit = 1;
+        printf("\nEnter amount you wish to withdraw");
+        printf(">> ");
+        scanf("%s", money);
+        for (int i = 0; i < strlen(money); i++)
+        {
+            if (!isdigit(money[i]))
+            {
+                isAllDigit = 0;
+                printf("Invalid Input!\n");
+                break;
+            }
+        }
+
+        if (isAllDigit)
+        {
+            atoi(money);
+            if ( atoi(money) > 10000){printf("\nYou can't withdraw greater than 10000.\nTo withdraw more than 10000 do it by batch.\n");}
+            if ( atoi(money) % 100 != 0){printf("\nYou can't withdraw something not divisible by 100.\n");}
+            if ( atoi(money) < 100){printf("\nYou can't withdraw something less than 100.\n");}
+        }
+
+    }
+    while(atoi(money) < 100 || atoi(money) % 100 != 0 || atoi(money) > 10000);
+    return atoi(money);
+}
+

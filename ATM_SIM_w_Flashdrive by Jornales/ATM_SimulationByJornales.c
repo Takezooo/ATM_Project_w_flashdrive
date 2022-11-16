@@ -50,7 +50,33 @@ void welcome_menu()
 
 void transaction_menu()
 {
+      int choice;
 
+    do{
+        system("cls");
+        printf("1. WITHDRAW\n");
+        printf("2. DEPOSIT\n");
+        printf("3. BACK TO WELCOME SCREEN\n");
+
+        choice = switch_validator();
+        switch(choice)
+        {
+            case 1:
+                printf("WITHDRAW\n");
+                withdraw();
+                break;
+
+            case 2:
+                printf("DEPOSIT\n");
+                deposit();
+                break;
+            case 3:
+                printf("BACK\n");
+                system("pause");
+                return welcome_menu();
+
+        }
+    }while(choice == 0);
 }
 
 void insertcard()
@@ -103,7 +129,7 @@ int switch_validator()
     {
         isAllDigit = 1;
 
-        printf("OPTION RANGES 1-4");
+        printf("OPTION RANGES 1-3");
         printf(">> ");
         scanf("%s", inputCheck);
         for (int i = 0; i < strlen(inputCheck); i++)

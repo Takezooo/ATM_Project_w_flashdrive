@@ -6,6 +6,11 @@
 #include "PincodeEncryption.c"
 
 #define MAX 100
+
+//GLOBAL VARIABLES
+char an[6];
+float balance;
+
 typedef struct record
 {
     char accNum[6];
@@ -37,13 +42,19 @@ int year_validator();
 void contactChecker(char contact[13]);
 char * removeSpacesFromStr(char *string);
 void welcome_menu();
+void transaction_menu();
 void insertcard();
 void pin();
 void removecard();
 void makenull();
 void add(REC x);
+void withdraw();
+void withdrawmain();
+void deposit();
+void depositmain();
 void display();
 void save();
+void saveATM();
 void retrieve();
 void registerAcc()
 {
@@ -90,7 +101,7 @@ void registerAcc()
         system("pause");
     }
     display();
-    return welcome_menu();
+    welcome_menu();
 }
 
 int locate(char accN[6])
@@ -115,11 +126,10 @@ int locPosition(char accN[6])
 
 int pinLocate(char Pin[4])
 {
-    printf("%s", Pin);
+
     int i;
     for (i = 0; i <= L.last; i++)
     {
-        printf("%s", L.bar[i].encryptedPin);
         if (strcmp(L.bar[i].encryptedPin, Pin) == 0)
         {
             return (i);
@@ -357,13 +367,14 @@ void pin()
     fclose(fp);
     if (p==-1)
     {
-        printf("Not found2.\n");
+        printf("\nIncorrect Pin.\n");
         system("pause");
-        registerAcc();
+        printf("\nEnter your pin again: ");
+        pin();
     }
     else
     {
-        return welcome_menu();
+        return transaction_menu();
     }
 }
 
@@ -390,6 +401,144 @@ void add(REC x)
         L.bar[p] = x;
 
         L.last++;
+    }
+}
+
+void withdraw()
+{
+    makenull();
+    FILE *fp;
+    REC r;
+    fp=fopen("E:\\test\\account.txt","r+");
+    if (fp == NULL)
+    {
+        printf("File error.\n");
+        system("pause");
+    }
+    else
+    {
+        while (!feof(fp))
+        {
+            fscanf(fp, "%s %s %s %s %s %f %s\n", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+            add(r);
+        }
+    }
+    fclose(fp);
+    strcpy(an, L.bar[L.last].accNum);
+    int p;
+    p=locate(an);
+    float withdraw, changedValue;
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+    }
+    else
+    {
+        system("cls");
+        printf("CURRENT BALANCE: %.2f\n", L.bar[p].initDep);
+        withdraw = withdraw_validator();
+        if(withdraw > L.bar[p].initDep)
+        {
+            printf("\nInsufficient Balance\n");
+            system("pause");
+            transaction_menu();
+        }
+        else
+        {
+            L.bar[p].initDep -= withdraw;
+            printf("Withdraw: %.2f\n", withdraw);
+            printf("Current Balance: %.2f\n", L.bar[p].initDep);
+            balance = L.bar[p].initDep;
+            system("pause");
+            saveATM();
+            withdrawmain();
+        }
+
+    }
+
+}
+
+void withdrawmain()
+{
+    makenull();
+    retrieve();
+    int p;
+    p=locate(an);
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+    }
+    else
+    {
+        L.bar[p].initDep = balance;
+        save();
+        transaction_menu();
+    }
+}
+
+void deposit()
+{
+    makenull();
+    FILE *fp;
+    REC r;
+    fp=fopen("E:\\test\\account.txt","r+");
+    if (fp == NULL)
+    {
+        printf("File error.\n");
+        system("pause");
+    }
+    else
+    {
+        while (!feof(fp))
+        {
+            fscanf(fp, "%s %s %s %s %s %f %s\n", r.accNum, r.fname, r.lname, r.birthday, r.contactNum, &r.initDep, r.encryptedPin);
+            add(r);
+        }
+    }
+    fclose(fp);
+    strcpy(an, L.bar[L.last].accNum);
+    int p;
+    p=locate(an);
+    float deposit, changedValue;
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+    }
+    else
+    {
+        printf("Enter amount you wish to deposit: ");
+        scanf("%f", &deposit);
+        L.bar[p].initDep += deposit;
+        printf("Withdraw: %.2f\n", deposit);
+        printf("Current Balance: %.2f\n", L.bar[p].initDep);
+        balance = L.bar[p].initDep;
+        system("pause");
+        saveATM();
+        depositmain();
+
+    }
+
+}
+
+void depositmain()
+{
+    makenull();
+    retrieve();
+    int p;
+    p=locate(an);
+    if (p==-1)
+    {
+        printf("Not found.\n");
+        system("pause");
+    }
+    else
+    {
+        L.bar[p].initDep = balance;
+        save();
+        transaction_menu();
     }
 }
 
@@ -435,6 +584,28 @@ void save()
     fclose(fp);
     fclose(fep);
 }
+
+void saveATM()
+{
+    FILE *fep;
+    int i;
+    fep = fopen("E:\\test\\account.txt", "w+");
+    if (fep == NULL)
+    {
+        printf("File error.\n");
+        system("pause");
+    }
+    else
+    {
+        for (i = 0; i <= 0; i++)
+        {
+            fprintf(fep, "%s %s %s %s %s %f %s\n", L.bar[i].accNum, L.bar[i].fname, L.bar[i].lname, L.bar[i].birthday,
+                    L.bar[i].contactNum, L.bar[i].initDep, L.bar[i].encryptedPin);
+        }
+    }
+    fclose(fep);
+}
+
 
 void retrieve()
 {
