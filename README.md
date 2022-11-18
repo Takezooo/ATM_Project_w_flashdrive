@@ -1,7 +1,7 @@
 # ATM_Project_w_flashdrive 
 By DAVE JORNALES
 
-- Make sure to keep them together inside the a folder.
+- Make sure to keep them together inside the folder.
 - Set path for flashdrive text file.
 - Make sure to create a blank text file in your flashdrive.
 - Upon running please choose insert card first if the file in your flashdrive is
